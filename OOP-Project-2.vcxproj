@@ -104,6 +104,7 @@
     <ClCompile Include="election_cycle.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="party.cpp" />
+    <ClCompile Include="simple_election_cycle.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="citizen.h" />
@@ -111,6 +112,7 @@
     <ClInclude Include="date.h" />
     <ClInclude Include="election_cycle.h" />
     <ClInclude Include="party.h" />
+    <ClInclude Include="simple_election_cycle.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
