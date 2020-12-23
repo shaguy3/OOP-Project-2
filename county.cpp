@@ -30,9 +30,10 @@ void County::resizeChosenElectors() {
     chosen_electors = new_arr;
 }
 
-County::County(char* _name, int _number_of_electors) :
+County::County(char* _name, int _number_of_electors, bool _is_relative) :
     id(County::num_of_counties),
     number_of_electors(_number_of_electors),
+    is_relative(is_relative),
     current_vote_amount(0),
     residents_num_logi(0),
     chosen_electors_logi(0),

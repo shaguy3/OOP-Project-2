@@ -1,16 +1,16 @@
 #include "election_cycle.h"
 #include <iostream>
-
+#include <string.h>
 
 using namespace std;
 
 const int VOTING_AGE = 16;
 
-void swap(int* a, int* b)
+void swap(int& a, int& b)
 {
-    int temp = *a;
-    *a = *b;
-    *b = temp;
+    int temp = a;
+    a = b;
+    b = temp;
 }
 
 void addCounty(ElectionCycle* election_cycle) {
@@ -18,11 +18,23 @@ void addCounty(ElectionCycle* election_cycle) {
     cout << "Please enter the County's name: ";
     cin >> county_name;
 
+    char is_relative;
+    cout << "Is the county relative (assignes it's electors relatively to the partie's vote percent)? (y/n): ";
+    cin >> is_relative;
+    while (is_relative != 'y' && is_relative != 'n') {
+        cout << "Not a valid input. please enter y for yes or n for no: ";
+        cin >> is_relative;
+    }
+
     int number_of_electors = 0;
     cout << "Please enter the number of electors in the county: ";
     cin >> number_of_electors;
+    while (number_of_electors <= 0) {
+        cout << "Not a valid number of electors. Please enter a positive number: " << endl;
+        cin >> number_of_electors;
+    }
 
-    County* new_county = new County(county_name, number_of_electors);
+    County* new_county = new County(county_name, number_of_electors, is_relative);
     election_cycle->addCounty(new_county);
 
     delete[] county_name;
@@ -145,7 +157,7 @@ void addPartyRep(ElectionCycle* election_cycle) {
     delete[] party_name;
 }
 
-void showCouties(ElectionCycle* election_cycle) {
+void showCounties(ElectionCycle* election_cycle) {
     cout << "County list: " << endl << endl;
     for (int i = 0; i < election_cycle->countieslen(); i++) {
         cout << i << ". " << *election_cycle->getCounties()[i] << endl;
@@ -219,28 +231,28 @@ void electionResults(ElectionCycle* election_cycle) {
     int* electors_per_party = new int[election_cycle->partieslen()];                //Amount of electors that each party received
     int* votes_per_party = new int[election_cycle->partieslen()];                   //Amount of votes that each party received
 
-    for (int i = 0; i < election_cycle->countieslen(); i++)     //Initilization of election_result array
+    for (int i = 0; i < election_cycle->countieslen(); i++)     // Initilization of election_result array
     {
         election_result[i] = new int[election_cycle->partieslen()];
         for (int j = 0; j < election_cycle->partieslen(); j++)
             election_result[i][j] = 0;
     }
 
-    for (int i = 0; i < election_cycle->countieslen(); i++)     //Initilization of percentage_table array
+    for (int i = 0; i < election_cycle->countieslen(); i++)     // Initilization of percentage_table array
     {
         percentage_table[i] = new double[election_cycle->partieslen()];
         for (int j = 0; j < election_cycle->partieslen(); j++)
             percentage_table[i][j] = 0;
     }
 
-    for (int i = 0; i < election_cycle->countieslen(); i++)     //Initilization of elected_reps_nums array
+    for (int i = 0; i < election_cycle->countieslen(); i++)     // Initilization of elected_reps_nums array
     {
         elected_reps_nums[i] = new int[election_cycle->partieslen()];
         for (int j = 0; j < election_cycle->partieslen(); j++)
             elected_reps_nums[i][j] = 0;
     }
 
-    for (int i = 0; i < election_cycle->partieslen(); i++) {    //Initialization of sorted_parties array
+    for (int i = 0; i < election_cycle->partieslen(); i++) {    // Initialization of sorted_parties array
         sorted_parties[i] = i;
     }
 
@@ -252,7 +264,7 @@ void electionResults(ElectionCycle* election_cycle) {
         votes_per_party[i] = 0;
     }
 
-    for (int i = 0; i < election_cycle->residentslen(); i++)    //Counting the votes for each county and party
+    for (int i = 0; i < election_cycle->residentslen(); i++)    // Counting the votes for each county and party
     {
         if (election_cycle->getResidents()[i]->hasVoted()) {
             int countyVote = election_cycle->getResidents()[i]->getHomeCounty()->getId();
@@ -261,13 +273,13 @@ void electionResults(ElectionCycle* election_cycle) {
         }
     }
 
-    for (int i = 0; i < election_cycle->partieslen(); i++)      //Counting the votes
+    for (int i = 0; i < election_cycle->partieslen(); i++)      // Summing the votes
     {
         for (int j = 0; j < election_cycle->countieslen(); j++)
             votes_per_party[i] += election_result[j][i];
     }
 
-    for (int i = 0; i < election_cycle->countieslen(); i++)     //Counting the percentage of the votes 
+    for (int i = 0; i < election_cycle->countieslen(); i++)     // Counting the percentage of the votes 
     {
         for (int j = 0; j < election_cycle->partieslen(); j++)
         {
@@ -276,7 +288,7 @@ void electionResults(ElectionCycle* election_cycle) {
         }
     }
 
-    for (int i = 0; i < election_cycle->countieslen(); i++)     //In case if showing results more than once
+    for (int i = 0; i < election_cycle->countieslen(); i++)     // In case of showing results more than once
     {
         for (int j = 0; j < election_cycle->getCounty(i)->chosenElectorsLen(); j++)
         {
@@ -285,18 +297,7 @@ void electionResults(ElectionCycle* election_cycle) {
         election_cycle->getCounty(i)->setChosenElectorsLen(0);
     }
 
-    for (int j = 0; j < election_cycle->partieslen(); j++) {    // Adding electors to each county
-        for (int k = 0; k < election_cycle->getParties()[j]->partyRepsLen(); k++) {
-            Citizen* chosen_elector = election_cycle->getParties()[j]->getPartyReps()[k];
-            int home_county_id = chosen_elector->getHomeCounty()->getId();
-            if (elected_reps_nums[home_county_id][j] > 0) {
-                election_cycle->getCounty(home_county_id)->addChosenElector(chosen_elector);
-                elected_reps_nums[home_county_id][j] -= 1;
-            }
-        }
-    }
-
-    for (int i = 0; i < election_cycle->countieslen(); i++) {   //Adding the parties that won in each county 
+    for (int i = 0; i < election_cycle->countieslen(); i++) {   // Adding the parties that won in each county 
         double winner_percentage = 0.0;
         int winner_index = 0;
         for (int j = 0; j < election_cycle->partieslen(); j++) {
@@ -310,8 +311,27 @@ void electionResults(ElectionCycle* election_cycle) {
 
 
     for (int i = 0; i < election_cycle->countieslen(); i++) {   // Calculating the sum of electors per party
-        electors_per_party[winner_per_county[i]->getId()] += election_cycle->getCounty(i)->getNumberOfElectors();
+        if (election_cycle->getCounty(i)->isRelative()) {
+            for (int j = 0; j < election_cycle->partieslen(); j++) {
+                electors_per_party[j] += elected_reps_nums[i][j];
+            }
+        }
+        else {
+            electors_per_party[winner_per_county[i]->getId()] += election_cycle->getCounty(i)->getNumberOfElectors();
+        }
     }
+
+    for (int j = 0; j < election_cycle->partieslen(); j++) {    // Adding electors to each county
+        for (int k = 0; k < election_cycle->getParties()[j]->partyRepsLen(); k++) {
+            Citizen* chosen_elector = election_cycle->getParties()[j]->getPartyReps()[k];
+            int home_county_id = chosen_elector->getHomeCounty()->getId();
+            if (elected_reps_nums[home_county_id][j] > 0) {
+                election_cycle->getCounty(home_county_id)->addChosenElector(chosen_elector);
+                elected_reps_nums[home_county_id][j] -= 1;
+            }
+        }
+    }
+
 
     cout << "Chosen county electors:" << endl;
     for (int i = 0; i < election_cycle->countieslen(); i++) {
@@ -337,23 +357,17 @@ void electionResults(ElectionCycle* election_cycle) {
     for (int i = 0; i < election_cycle->partieslen() - 1; i++) {
         for (int j = 0; j < election_cycle->partieslen() - i - 1; j++) {
             if (electors_per_party[j] < electors_per_party[j + 1]) {
-                swap(&sorted_parties[j], &sorted_parties[j + 1]);
-                swap(&electors_per_party[j], &electors_per_party[j + 1]);
+                swap(sorted_parties[j], sorted_parties[j + 1]);
+                // swap(electors_per_party[j], electors_per_party[j + 1]); // Guy was right
             }
         }
     }
 
-    for (int i = 0; i < election_cycle->partieslen(); i++)
-    {
-        cout << "*****Checking if the sorting was right*****" << endl;
-        cout << "Party #" << sorted_parties[i] << endl;
-    }
-    cout << endl;
-
     cout << "Final results:" << endl << endl;
     for (int i = 0; i < election_cycle->partieslen(); i++) {
         cout << i + 1 << " place: " << election_cycle->getParties()[sorted_parties[i]]->getLeader()->getName()
-            << " with " << votes_per_party[sorted_parties[i]] << " votes" << endl;
+            << " with " << votes_per_party[sorted_parties[i]] << " votes" \
+            << " and " << electors_per_party[sorted_parties[i]] << " electors. " << endl;
     }
 
 
@@ -457,7 +471,7 @@ void mainMenu() {
             break;
 
         case 5:
-            showCouties(election_cycle);
+            showCounties(election_cycle);
             break;
 
         case 6:

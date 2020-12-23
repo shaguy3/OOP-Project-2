@@ -9,6 +9,7 @@ class County {
 private:
     char* name;
     int id;
+    bool is_relative;
     int number_of_electors;
     int current_vote_amount;
     Citizen** residents;
@@ -23,11 +24,12 @@ private:
 public:
     static int num_of_counties;
     /* Counstructors and destructors */
-    County(char* _name, int _number_of_electors);
+    County(char* _name, int _number_of_electors, bool _is_relative);
     ~County();
     /* Getters */
     char* getName() const { return name; }
     int getId() const { return id; }
+    bool isRelative() const { return is_relative; }
     int getVoteAmount() const { return current_vote_amount; }
     int getNumberOfElectors() const { return number_of_electors; }
     Citizen** getResidents() const { return residents; }
