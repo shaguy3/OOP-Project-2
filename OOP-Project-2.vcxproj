@@ -99,17 +99,21 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="citizen.cpp" />
+    <ClCompile Include="complex_cycle.cpp" />
     <ClCompile Include="county.cpp" />
     <ClCompile Include="date.cpp" />
     <ClCompile Include="election_cycle.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="party.cpp" />
+    <ClCompile Include="simple_cycle.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="citizen.h" />
+    <ClInclude Include="complex_cycle.h" />
     <ClInclude Include="county.h" />
     <ClInclude Include="date.h" />
     <ClInclude Include="election_cycle.h" />
+    <ClInclude Include="simple_cycle.h" />
     <ClInclude Include="party.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

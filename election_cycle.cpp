@@ -6,19 +6,17 @@ ElectionCycle::ElectionCycle(Date& _date_of_election) :
     residents_num_size(5),
     residents_num_logi(0),
     parties_num_size(5),
-    parties_num_logi(0),
-    counties_num_size(5),
-    counties_num_logi(0)
+    parties_num_logi(0)
 {
     residents = new Citizen * [residents_num_size];
     parties = new Party * [parties_num_size];
-    counties = new County * [counties_num_size];
+
 }
 
 ElectionCycle::~ElectionCycle() {
     delete[] residents;
     delete[] parties;
-    delete[] counties;
+
 }
 
 void ElectionCycle::resizeResidents() {
@@ -43,18 +41,7 @@ void ElectionCycle::resizeParties() {
     parties = new_arr;
 }
 
-void ElectionCycle::resizeCounties() {
-    counties_num_size *= 2;
-    County** new_arr = new County * [counties_num_size];
-
-    for (int i = 0; i < counties_num_logi; i++) {
-        new_arr[i] = counties[i];
-    }
-
-    counties = new_arr;
-}
-
-Citizen* ElectionCycle::getResident(int id) {
+Citizen* ElectionCycle::getResident(int id) const {
     int cur = 0;
     do {
         if (residents[cur]->getId() == id) { return residents[cur]; }
@@ -64,7 +51,7 @@ Citizen* ElectionCycle::getResident(int id) {
     return nullptr;
 }
 
-Party* ElectionCycle::getParty(char* party_name) {
+Party* ElectionCycle::getParty(char* party_name) const {
     for (int i = 0; i < parties_num_logi; i++) {
         if (!strcmp(parties[i]->getName(), party_name)) {
             return parties[i];
@@ -72,10 +59,6 @@ Party* ElectionCycle::getParty(char* party_name) {
     }
 
     return nullptr;
-}
-
-County* ElectionCycle::getCounty(int id) {
-    return counties[id];
 }
 
 bool ElectionCycle::addResident(Citizen* resident) {
@@ -100,36 +83,4 @@ bool ElectionCycle::addParty(Party* party) {
     parties_num_logi++;
 
     return true;
-}
-
-bool ElectionCycle::addCounty(County* county) {
-    if (counties_num_logi == counties_num_size) { resizeCounties(); }
-
-    counties[counties_num_logi] = county;
-    counties_num_logi++;
-
-    return true;
-}
-
-ostream& operator<<(ostream& os, ElectionCycle& election_cycle) {
-    os << "Election cycle of date: " << election_cycle.getDate() << endl \
-        << "Residents: " << endl;
-
-    for (int i = 0; i < election_cycle.residentslen(); i++) {
-        os << *election_cycle.getResidents()[i] << endl;
-    }
-
-    os << endl << "Counties: " << endl;
-
-    for (int i = 0; i < election_cycle.countieslen(); i++) {
-        os << *election_cycle.getCounties()[i] << endl;
-    }
-
-    os << endl << "Parties: " << endl;
-
-    for (int i = 0; i < election_cycle.partieslen(); i++) {
-        os << *election_cycle.getParties()[i] << endl;
-    }
-
-    return os;
 }
