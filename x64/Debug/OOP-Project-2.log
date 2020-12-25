@@ -1,2 +1,5 @@
-﻿  main.cpp
+﻿  citizen.cpp
+  main.cpp
+  Generating Code...
+C:\Users\גיא\Documents\Repos\OOP-Project-2\citizen.cpp(36): warning C4715: 'operator<<': not all control paths return a value
   OOP-Project-2.vcxproj -> C:\Users\גיא\Documents\Repos\OOP-Project-2\x64\Debug\OOP-Project-2.exe

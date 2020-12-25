@@ -102,7 +102,7 @@ void addResident(ElectionCycle* election_cycle) {
 
         int county_id = 0;
 
-        Citizen* new_resident = new Citizen(resident_name, id, year_of_birth, 0);
+        Citizen* new_resident = new Citizen(resident_name, id, year_of_birth, nullptr);
         simple_cycle->addResident(new_resident);
     }
 
