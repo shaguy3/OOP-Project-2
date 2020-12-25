@@ -662,10 +662,3 @@ int main() {
 
     return 0;
 }
-
-
-//                  ElectionCycle
-//                  /           \
-//                 /             \
-//          SimpleCycle        ComplexCycle
-//           *County            **County
