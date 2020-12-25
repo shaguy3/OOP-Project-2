@@ -27,12 +27,13 @@ std::ostream& operator<<(std::ostream& os, const Citizen& other)
         os << "Name: " << other.name << endl << "Id: " << other.id << endl \
             << "Year of birth: " << other.year_of_birth << endl \
             << "Home county: " << other.home_county->getName() << "(ID: " << other.home_county->getId() << ")" << endl;
-        return os;
     }
     else {
         os << "Name: " << other.name << endl << "Id: " << other.id << endl \
             << "Year of birth: " << other.year_of_birth << endl;
     }
+
+    return os;
 }
 
 bool Citizen::makeRepresentative(Party* party_name) {
