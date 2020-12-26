@@ -231,13 +231,13 @@ void addVote(ElectionCycle* election_cycle) {
     } while (!voted_party);
 
     voter->setVoted(voted_party);
-    voter->getHomeCounty()->addVote();
+    if (voter->getHomeCounty()) { voter->getHomeCounty()->addVote(); }
     election_cycle->addVote();
 
     delete[] party_name;
 }
 
-void electionResults(ComplexCycle* election_cycle) {
+void complexElectionResults(ComplexCycle* election_cycle) {
 
     cout << "*****************Printing election results!********************" << endl << endl;
 
@@ -379,7 +379,8 @@ void electionResults(ComplexCycle* election_cycle) {
             }
         }
     }
-
+    
+    // TODO: print vote percentage.
     cout << "Final results:" << endl << endl;
     for (int i = 0; i < election_cycle->partieslen(); i++) {
         cout << i + 1 << " place: " << election_cycle->getParties()[sorted_parties[i]]->getLeader()->getName()
@@ -406,8 +407,93 @@ void electionResults(ComplexCycle* election_cycle) {
     delete[] electors_per_party;
     delete[] votes_per_party;
     delete[] sorted_parties;
+}
+
+void simpleElectionResults(SimpleCycle* election_cycle) {
+    int* election_results = new int[election_cycle->partieslen()];              //Number of votes for each party.
+    double* percentage_table = new double[election_cycle->partieslen()];        //Percentage of received votes for each party.
+    int* elected_reps_nums = new int[election_cycle->partieslen()];             //Number of electors for each party.
+    int* sorted_parties = new int[election_cycle->partieslen()];                //Parties sorted from the most electors to less.
+
+    for (int i = 0; i < election_cycle->partieslen(); i++) {
+        election_results[i] = 0;
+        percentage_table[i] = 0.0;
+        elected_reps_nums[i] = 0;
+        sorted_parties[i] = i;
+    }
+
+    for (int i = 0; i < election_cycle->residentslen(); i++) { // Counting the votes.
+        if (election_cycle->getResidents()[i]->hasVoted()) {
+            election_results[election_cycle->getResidents()[i]->hasVoted()->getId()]++;
+        }
+    }
+
+    for (int i = 0; i < election_cycle->partieslen(); i++) { // Calculating the percentages of the votes and the electors per party.
+        percentage_table[i] = (static_cast<double>(election_results[i]) / static_cast<double>(election_cycle->getVoteAmount())) * 100.0;
+        elected_reps_nums[i] = static_cast<int>(((percentage_table[i] / 100) * election_cycle->getNumberOfElectors()) + 0.5);
+    }
+
+    for (int i = 0; i < election_cycle->chosenElectorsLen(); i++) { // In case of showing results more than once
+        election_cycle->getChosenElectors()[i] = nullptr;
+    }
+    election_cycle->setChosenElectorsLen(0);
+
+    // Searching for the winner party
+    Party* winner = nullptr;
+    double winner_percentage = 0.0;
+    for (int i = 0; i < election_cycle->partieslen(); i++) {
+        if (percentage_table[i] > winner_percentage) {
+            winner_percentage = percentage_table[i];
+            winner = election_cycle->getParties()[i];
+        }
+    }
+
+    for (int i = 0; i < election_cycle->partieslen(); i++) {
+        int cur_num_of_reps = elected_reps_nums[i];
+        for (int j = 0; j < election_cycle->getParties()[i]->partyRepsLen(); j++) {
+            Citizen* chosen_elector = election_cycle->getParties()[i]->getPartyReps()[j];
+            if (cur_num_of_reps > 0) {
+                election_cycle->addChosenElector(chosen_elector);
+                cur_num_of_reps--;
+            }
+        }
+    }
+
+    cout << "Chosen electors: " << endl;
+    for (int i = 0; i < election_cycle->chosenElectorsLen(); i++) {
+        cout << *election_cycle->getChosenElectors()[i];
+        cout << "Party: " << election_cycle->getChosenElectors()[i]->isRepresentative()->getName() << endl << endl;
+    }
+    cout << endl;
+
+    for (int i = 0; i < election_cycle->partieslen(); i++) {
+        cout << "Party " << election_cycle->getParties()[i]->getName() << " recieved " << \
+            percentage_table[i] << "% of the votes" << endl;
+    }
+
+    cout << "The winner is: " << winner->getLeader()->getName() << endl << endl;
+
+    for (int i = 0; i < election_cycle->partieslen() - 1; i++) {
+        for (int j = 0; j < election_cycle->partieslen() - i - 1; j++) {
+            if (elected_reps_nums[j] < elected_reps_nums[j + 1]) {
+                swap(sorted_parties[j], sorted_parties[j + 1]);
+            }
+        }
+    }
+
+    // TODO: print vote percentage.
+    cout << "Final resurlts: " << endl << endl;
+    for (int i = 0; i < election_cycle->partieslen(); i++) {
+        cout << i + 1 << " place: " << election_cycle->getParties()[sorted_parties[i]]->getLeader()->getName() \
+            << " with " << election_results[i] << " votes" \
+            << " and " << elected_reps_nums[sorted_parties[i]] << " electors." << endl;
+    }
 
 
+    delete[] sorted_parties;
+    delete[] elected_reps_nums;
+    delete[] percentage_table;
+    delete[] election_results;
 }
 
 void mainMenu(ElectionCycle* election_cycle) {
@@ -558,7 +644,7 @@ void mainMenu(ElectionCycle* election_cycle) {
                     }
 
 
-                    if (valid_reps_nums) { electionResults(complex_cycle); }
+                    if (valid_reps_nums) { complexElectionResults(complex_cycle); }
 
                     for (int i = 0; i < election_cycle->partieslen(); i++)  //Deleting the temp array
                         delete[] representatives_per_party_per_county[i];
@@ -566,7 +652,23 @@ void mainMenu(ElectionCycle* election_cycle) {
                 }
             }
             else {
-                cout << "Printing election results for simple election cycle." << endl;
+                SimpleCycle* simple_cycle = dynamic_cast<SimpleCycle*>(election_cycle);
+                if (simple_cycle->getVoteAmount() == 0) {
+                    cout << "Nobody voted! Please vote! You don't want another 2016!" << endl;
+                }
+                else {
+                    bool valid_reps_nums = true;
+                    for (int i = 0; i < simple_cycle->partieslen(); i++) {
+                        if (simple_cycle->getParties()[i]->partyRepsLen() < simple_cycle->getNumberOfElectors()) {
+                            cout << "Party: " << simple_cycle->getParties()[i]->getName() << " does not have enough representatives." \
+                                << " Please enter more representatives for the specified party." << endl;
+                            valid_reps_nums = false;
+                            break;
+                        }
+                    }
+
+                    if (valid_reps_nums) { simpleElectionResults(simple_cycle); }
+                }
             }
             break;
         }

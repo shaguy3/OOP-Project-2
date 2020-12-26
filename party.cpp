@@ -56,12 +56,20 @@ ostream& operator<<(ostream& os, const Party& party)
 {
     os << "Party name: " << party.name << ". Leader " << party.party_leader->getName() << '.' << endl;
     os << "County representatives:" << endl << endl;
-    for (int i = 0; i < County::num_of_counties; i++) {
-        os << "County num " << i << ":" << endl;
-        for (int j = 0; j < party.party_size_logi; j++) {
-            if (party.party_reps[j]->getHomeCounty()->getId() == i) {
-                os << *party.party_reps[j] << endl << endl;
+
+    if (County::num_of_counties > 0) {
+        for (int i = 0; i < County::num_of_counties; i++) {
+            os << "County num " << i << ":" << endl;
+            for (int j = 0; j < party.party_size_logi; j++) {
+                if (party.party_reps[j]->getHomeCounty()->getId() == i) {
+                    os << *party.party_reps[j] << endl << endl;
+                }
             }
+        }
+    }
+    else {
+        for (int i = 0; i < party.party_size_logi; i++) {
+            os << *party.party_reps[i] << endl << endl;
         }
     }
 
