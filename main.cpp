@@ -80,7 +80,7 @@ void addResident(ElectionCycle* election_cycle) {
 
     if (typeid(*election_cycle).name() == typeid(ComplexCycle).name()) {
 
-        // TODO: May cause loss of pointer. Check.
+        // TODO: May cause loss of pointer. Check. (Works fine for now)
         ComplexCycle* complex_cycle = dynamic_cast<ComplexCycle*>(election_cycle);
 
         int county_id = -1;
@@ -140,19 +140,19 @@ void addParty(ElectionCycle* election_cycle) {
 }
 
 void addPartyRep(ElectionCycle* election_cycle) {
-    Citizen* relavent_citizen = nullptr;
+    Citizen* relevant_citizen = nullptr; 
     Party* relevant_party = nullptr;
     int party_rep_id = -1;
     cout << "Please enter the ID of the party's representative: ";
     do {
         cin >> party_rep_id;
-        relavent_citizen = election_cycle->getResident(party_rep_id);
-        if (!relavent_citizen) {
+        relevant_citizen = election_cycle->getResident(party_rep_id);
+        if (!relevant_citizen) {
             cout << "There is no resident with matching ID. Please enter an existing resident's ID: ";
             party_rep_id = -1;
         }
 
-        else if (relavent_citizen->isRepresentative()) {
+        else if (relevant_citizen->isRepresentative()) {
             cout << "This resident is already a representative. Please select another citizen: ";
             party_rep_id = -1;
         }
@@ -168,7 +168,9 @@ void addPartyRep(ElectionCycle* election_cycle) {
         }
     } while (!relevant_party);
 
-    relavent_citizen->makeRepresentative(relevant_party);
+    //TODO: Think of the way to choose which county to represent
+
+    relevant_citizen->makeRepresentative(relevant_party);
     relevant_party->addPartyRep(election_cycle->getResident(party_rep_id));
 
     delete[] party_name;
@@ -188,7 +190,6 @@ void showResidents(ElectionCycle* election_cycle) {
     for (int i = 0; i < election_cycle->residentslen(); i++) {
         cout << i << ". " << *election_cycle->getResidents()[i] << endl;
     }
-    // TODO: Figure out how to show residents for simple election cycle.
 
     cout << endl;
 }
@@ -380,7 +381,9 @@ void complexElectionResults(ComplexCycle* election_cycle) {
         }
     }
     
-    // TODO: print vote percentage.
+    // TODO: print vote percentage. We did it for each county, is there a need for overall percentage?
+ 
+
     cout << "Final results:" << endl << endl;
     for (int i = 0; i < election_cycle->partieslen(); i++) {
         cout << i + 1 << " place: " << election_cycle->getParties()[sorted_parties[i]]->getLeader()->getName()
@@ -481,8 +484,11 @@ void simpleElectionResults(SimpleCycle* election_cycle) {
         }
     }
 
-    // TODO: print vote percentage.
-    cout << "Final resurlts: " << endl << endl;
+
+    cout << "The overall turnout percentage: " << (static_cast<double>(election_cycle->getVoteAmount()) /
+        static_cast<double>(election_cycle->residentslen())) * 100.0 << "%" << endl << endl;
+
+    cout << "Final results: " << endl << endl;
     for (int i = 0; i < election_cycle->partieslen(); i++) {
         cout << i + 1 << " place: " << election_cycle->getParties()[sorted_parties[i]]->getLeader()->getName() \
             << " with " << election_results[i] << " votes" \
@@ -498,6 +504,8 @@ void simpleElectionResults(SimpleCycle* election_cycle) {
 
 void mainMenu(ElectionCycle* election_cycle) {
     int choice = 0;
+
+    enum mainMenu {None, Add_county, Add_citizen, Add_party, Add_rep, Show_counties, Show_residents, Show_parties, Voting, Results, Exit };
 
     while (choice != 10) {
         cout << "Please select an option:" << endl;
@@ -521,7 +529,7 @@ void mainMenu(ElectionCycle* election_cycle) {
         }
 
         switch (choice) {
-        case 1:
+        case Add_county:
             if (typeid(*election_cycle).name() == typeid(ComplexCycle).name()) {
                 ComplexCycle* complex_cycle = dynamic_cast<ComplexCycle*>(election_cycle);
                 addCounty(complex_cycle);
@@ -531,7 +539,7 @@ void mainMenu(ElectionCycle* election_cycle) {
             }
             break;
 
-        case 2:
+        case Add_citizen:
             if (typeid(*election_cycle).name() == typeid(ComplexCycle).name()) {
                 ComplexCycle* complex_cycle = dynamic_cast<ComplexCycle*>(election_cycle);
                 if (complex_cycle->countieslen() == 0) {
@@ -544,7 +552,7 @@ void mainMenu(ElectionCycle* election_cycle) {
             }
             break;
 
-        case 3:
+        case Add_party:
             if (election_cycle->residentslen() == 0) {
                 cout << "There are no residents! Who will lead the party? (Enter a resident first)" << endl;
             }
@@ -563,7 +571,7 @@ void mainMenu(ElectionCycle* election_cycle) {
             }
             break;
 
-        case 4:
+        case Add_rep:
             if (election_cycle->partieslen() == 0) {
                 cout << "There are no parties to add representatives to. Please add a party first." << endl;
             }
@@ -583,7 +591,7 @@ void mainMenu(ElectionCycle* election_cycle) {
             }
             break;
 
-        case 5:
+        case Show_counties:
             if (typeid(*election_cycle).name() == typeid(ComplexCycle).name()) {
                 ComplexCycle* complex_cycle = dynamic_cast<ComplexCycle*>(election_cycle);
                 showCounties(complex_cycle);
@@ -593,15 +601,15 @@ void mainMenu(ElectionCycle* election_cycle) {
             }
             break;
 
-        case 6:
+        case Show_residents:
             showResidents(election_cycle);
             break;
 
-        case 7:
+        case Show_parties:
             showParties(election_cycle);
             break;
 
-        case 8:
+        case Voting:
 
             if (election_cycle->partieslen() == 0) {
                 cout << "There are no parties to vote to. Please add a party first." << endl;
@@ -613,7 +621,7 @@ void mainMenu(ElectionCycle* election_cycle) {
             cout << "Thanks for voting!" << endl;
             break;
 
-        case 9:
+        case Results:
             if (typeid(*election_cycle).name() == typeid(ComplexCycle).name()) {
                 ComplexCycle* complex_cycle = dynamic_cast<ComplexCycle*>(election_cycle);
                 if (complex_cycle->getVoteAmount() == 0)
@@ -680,6 +688,8 @@ void mainMenu(ElectionCycle* election_cycle) {
 void firstMenu() {
     int choice = 0;
 
+    enum firstMenu {None, New_Election_Cycle, Load_Election_Cycle, Exit};
+
     cout << "Please select an option: " << endl \
         << "1. Create a new election cycle" << endl \
         << "2. Load an existing election cycle" << endl \
@@ -692,19 +702,38 @@ void firstMenu() {
 
     switch (choice)
     {
-    case 1:
+    case New_Election_Cycle:
     {
         int day = 0, month = 0, year = 0;
         cout << "Please choose the day of the election: ";
         cin >> day;
+        while (day <= 0 || day > 31)
+        {
+            cout << "Day format is wrong. Please enter the number between 1-31. ";
+            cin >> day;
+        }
+
         cout << "Please choose the month of the election: ";
         cin >> month;
+        while (month <= 0 || month > 12)
+        {
+            cout << "Month format is wrong. Please enter the number between 1-12. ";
+            cin >> month;
+        }
+
         cout << "Please choose the year of the election: ";
         cin >> year;
+        while (year < 0)
+        {
+            cout << "Year format is wrong. Please enter a positive number. ";
+            cin >> year;
+        }
+
         Date date_of_election(day, month, year);
-        // TODO: handle invald input.
 
         int type;
+        enum electionType { None, Simple_cycle, Complex_cycle };
+
         cout << "Pleae enter the type of the election cycle" \
             << " (1: Simple election cycle, 2: Complex election cycle): ";
         cin >> type;
@@ -715,7 +744,7 @@ void firstMenu() {
             cin >> type;
         }
 
-        if (type == 1) {
+        if (type == Simple_cycle) {
             int number_of_electors = 0;
             cout << "Please choose the number of electors in the election cycle: ";
             cin >> number_of_electors;
@@ -728,18 +757,18 @@ void firstMenu() {
             ElectionCycle* election_cycle = new SimpleCycle(date_of_election, number_of_electors);
             mainMenu(election_cycle);
         }
-        else {
+        else if (type == Complex_cycle) {
             ElectionCycle* election_cycle = new ComplexCycle(date_of_election);
             mainMenu(election_cycle);
         }
 
         break;
     }
-    case 2:
+    case Load_Election_Cycle:
         // Load an existing election cycle.
         break;
 
-    case 3:
+    case Exit:
         return;
         break;
 
