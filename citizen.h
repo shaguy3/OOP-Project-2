@@ -22,7 +22,7 @@ public:
     Citizen(char* _name, int _id, int _year_of_birth, County* _home_county);
     ~Citizen();
     /*Getters*/
-    char* getName() const { return name; }
+    const char* getName() const { return name; }
     int getId() const { return id; }
     int getYearOfBirth() const { return year_of_birth; }
     County* getHomeCounty() const { return home_county; }
