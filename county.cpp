@@ -30,6 +30,22 @@ void County::resizeChosenElectors() {
     chosen_electors = new_arr;
 }
 
+County::County() :
+    name(nullptr),
+    id(County::num_of_counties),
+    number_of_electors(0),
+    is_relative(0),
+    current_vote_amount(0),
+    residents_num_logi(0),
+    chosen_electors_logi(0),
+    residents_num_size(5),
+    chosen_electors_size(5)
+{
+    residents = new Citizen * [residents_num_size];
+    chosen_electors = new Citizen * [chosen_electors_size];
+    County::num_of_counties++;
+}
+
 County::County(char* _name, int _number_of_electors, bool _is_relative) :
     id(County::num_of_counties),
     number_of_electors(_number_of_electors),
@@ -89,4 +105,46 @@ County::~County() {
     delete[] name;
     delete[] residents;
     delete[] chosen_electors;
+}
+
+void County::save(ostream& out) const
+{
+    /*Saving the name*/
+    int len = strlen(name);
+    out.write(rcastcc(&len), sizeof(len));  
+    for (int i = 0; i < len; i++)
+    {
+        out.write(rcastcc(&name[i]), sizeof(char));
+    }
+
+    /*Saving the id*/
+    out.write(rcastcc(&id), sizeof(id));
+
+    /*Saving if the county is relative*/
+    out.write(rcastcc(&is_relative), sizeof(is_relative));
+
+    /*Saving number of the electors*/
+    out.write(rcastcc(&number_of_electors), sizeof(number_of_electors));
+
+    /*Saving the current vote amount*/
+    out.write(rcastcc(&current_vote_amount), sizeof(current_vote_amount));
+
+}
+
+void County::load(istream& in)
+{
+    int len;
+    in.read(rcastc(&len), sizeof(len));
+    name = new char[len + 1];
+    for (int i = 0; i < len; i++)
+    {
+        in.read(rcastc(&name[i]), sizeof(char));
+    }
+    name[len] = '\0';
+
+    in.read(rcastc(&id), sizeof(id));
+    in.read(rcastc(&is_relative), sizeof(is_relative));
+    in.read(rcastc(&number_of_electors), sizeof(number_of_electors));
+    in.read(rcastc(&current_vote_amount), sizeof(current_vote_amount));
+    
 }

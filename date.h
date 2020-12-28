@@ -1,4 +1,8 @@
 #include <iostream>
+#include <fstream>
+
+#define rcastcc reinterpret_cast<const char*>
+#define rcastc reinterpret_cast<char*>
 using namespace std;
 
 class Date {
@@ -14,4 +18,9 @@ public:
     bool setYear(int _year);
     friend ostream& operator<<(ostream& os, const Date& date);
     ~Date();
+    
+    /*Serialization*/
+
+    void save(ostream& out) const;
+    void load(istream& in);
 };

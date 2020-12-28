@@ -3,6 +3,7 @@
 #include <iostream>
 #include <string.h>
 #include <typeinfo>
+#include <fstream>
 
 using namespace std;
 
@@ -505,7 +506,8 @@ void simpleElectionResults(SimpleCycle* election_cycle) {
 void mainMenu(ElectionCycle* election_cycle) {
     int choice = 0;
 
-    enum mainMenu {None, Add_county, Add_citizen, Add_party, Add_rep, Show_counties, Show_residents, Show_parties, Voting, Results, Exit };
+    enum mainMenu {None, Add_county, Add_citizen, Add_party, Add_rep, Show_counties, Show_residents, Show_parties, Voting, Results, Exit, 
+    Save_Cycle, Load_Cycle};
 
     while (choice != 10) {
         cout << "Please select an option:" << endl;
@@ -518,12 +520,14 @@ void mainMenu(ElectionCycle* election_cycle) {
         cout << "7.  Show all of the parties." << endl;
         cout << "8.  Vote." << endl;
         cout << "9.  Show the election results." << endl;
-        cout << "10. Quit." << endl << endl;
+        cout << "10. Quit." << endl;
+        cout << "11. Save current election cycle." << endl;
+        cout << "12. Load existing election cycle." << endl << endl;
 
         cin >> choice;
         cout << endl;
 
-        if (choice > 10 || choice < 1) {
+        if (choice > 12 || choice < 1) {
             cout << "Not a valid choice. Please choose a number between 1 and 10." << endl << endl;
             continue;
         }
@@ -678,6 +682,50 @@ void mainMenu(ElectionCycle* election_cycle) {
                     if (valid_reps_nums) { simpleElectionResults(simple_cycle); }
                 }
             }
+            break;
+        case Save_Cycle:
+        {
+            char filename[30];
+            cout << "Saving current election cycle..." << endl;
+            cout << "Please enter the name of the file you want to save (no spaces and extention required). ";
+            cin >> filename;
+
+            ofstream outfile(filename, ios::binary);
+            if (!outfile) {
+                cout << "Error with outfile" << endl;
+                exit(-1);
+            }
+
+            //election_cycle->getDate().save(outfile);
+
+            ComplexCycle* complex_cycle = dynamic_cast<ComplexCycle*>(election_cycle);
+            complex_cycle->getCounty(0)->save(outfile);
+
+            outfile.close();
+            break;
+        }
+
+        case Load_Cycle:
+            ComplexCycle* complex_cycle = dynamic_cast<ComplexCycle*>(election_cycle);
+            char filename[30];
+            cout << "Please enter the name of the file you want to load (no spaces and extention required). ";
+            cin >> filename;
+
+            ifstream infile(filename, ios::binary);
+            if (!infile) {
+                cout << "Error with infile" << endl;
+                exit(-1);
+            }
+
+            //election_cycle->getDate().load(infile);
+            County* newCounty = new County();
+
+            newCounty->load(infile);
+            cout << *newCounty << endl;
+
+            infile.close();
+
+            
             break;
         }
 

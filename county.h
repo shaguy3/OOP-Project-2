@@ -1,5 +1,10 @@
 #pragma once
 #include "citizen.h"
+#include <fstream>
+
+#define rcastcc reinterpret_cast<const char*>
+#define rcastc reinterpret_cast<char*>
+
 using namespace std;
 class Citizen;
 
@@ -25,6 +30,8 @@ public:
     static int num_of_counties;
     /* Counstructors and destructors */
     County(char* _name, int _number_of_electors, bool _is_relative);
+    County();
+   
     ~County();
     /* Getters */
     char* getName() const { return name; }
@@ -44,4 +51,9 @@ public:
     bool addChosenElector(Citizen* chosen_elector);
     /* Operator overloads */
     friend ostream& operator<<(ostream& os, const County& county);
+
+    /*Serialization*/
+
+    void save(ostream& out) const;
+    void load(istream& in);
 };
