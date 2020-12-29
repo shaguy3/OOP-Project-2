@@ -54,3 +54,11 @@ ostream& operator<<(ostream& os, ComplexCycle& election_cycle) {
 
     return os;
 }
+
+void ComplexCycle::save(ostream& out) const {
+
+}
+
+void ComplexCycle::load(istream& in) {
+
+}

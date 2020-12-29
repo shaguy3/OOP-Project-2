@@ -9,7 +9,7 @@
 using namespace std;
 
 class ElectionCycle {
-private:
+protected:
     int current_vote_amount;        //Increases when voting 
     Date date_of_election;
     Citizen** residents;
@@ -23,6 +23,7 @@ private:
 
 public:
     /* Constructors and destructors */
+    ElectionCycle();
     ElectionCycle(Date& _date_of_election);
     virtual ~ElectionCycle();
     /* Getters */
@@ -39,4 +40,7 @@ public:
     bool addVote();
     bool addResident(Citizen* resident);
     bool addParty(Party* party);
+    /* serialization */
+    virtual void save(ostream& out) const = 0;
+    virtual void load(istream& in) = 0;
 };

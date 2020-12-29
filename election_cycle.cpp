@@ -1,5 +1,16 @@
 #include "election_cycle.h"
 
+ElectionCycle::ElectionCycle() :
+    date_of_election({ 0,0,0 }),
+    current_vote_amount(0),
+    residents_num_size(5),
+    residents_num_logi(0),
+    parties_num_size(5),
+    parties_num_logi(0),
+    residents(nullptr),
+    parties(nullptr)
+{}
+
 ElectionCycle::ElectionCycle(Date& _date_of_election) :
     date_of_election(_date_of_election),
     current_vote_amount(0),

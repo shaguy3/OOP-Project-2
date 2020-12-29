@@ -3,6 +3,15 @@
 
 int Party::number_of_parties = 0;
 
+Party::Party() :
+    name(nullptr),
+    id(0),
+    party_leader(nullptr),
+    party_size(0),
+    party_size_logi(0),
+    party_reps(nullptr)
+{}
+
 Party::Party(char* _name, Citizen* _party_leader)
     : party_leader(_party_leader), id(number_of_parties),
     party_size(5), party_size_logi(0)
@@ -74,4 +83,49 @@ ostream& operator<<(ostream& os, const Party& party)
     }
 
     return os;
+}
+
+void Party::save(ostream& out) const {
+    /*Saving the name*/
+    int len = strlen(name);
+    out.write(rcastcc(&len), sizeof(len));
+    for (int i = 0; i < len; i++)
+    {
+        out.write(rcastcc(&name[i]), sizeof(char));
+    }
+
+    /*Saving the id*/
+    out.write(rcastcc(&id), sizeof(id));
+
+    /*Saving the leader id*/
+    int leader_id = party_leader->getId();
+    out.write(rcastcc(&leader_id), sizeof(leader_id));
+
+    /*Saving the party size*/
+    out.write(rcastcc(&party_size), sizeof(party_size));
+
+    /*Saving the logical party size*/
+    out.write(rcastcc(&party_size_logi), sizeof(party_size_logi));
+
+    /*Saving the party reps*/
+    int cur_rep_id = 0;
+    for (int i = 0; i < party_size_logi; i++) {
+        cur_rep_id = party_reps[i]->getId();
+        out.write(rcastcc(&cur_rep_id), sizeof(cur_rep_id));
+    }
+}
+
+void Party::load(istream& in) {
+    /*Loading the name*/
+    int len;
+    in.read(rcastc(&len), sizeof(len));
+    name = new char[len + 1];
+    for (int i = 0; i < len; i++)
+    {
+        in.read(rcastc(&name[i]), sizeof(char));
+    }
+    name[len] = '\0';
+
+    /*Loading the id*/
+    in.read(rcastc(&id), sizeof(id));
 }

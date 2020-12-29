@@ -1,5 +1,11 @@
 #pragma once
 #include "election_cycle.h"
+#include <fstream>
+
+using namespace std;
+
+#define rcastcc reinterpret_cast<const char*>
+#define rcastc reinterpret_cast<char*>
 
 class SimpleCycle : public ElectionCycle {
 private:
@@ -11,6 +17,7 @@ private:
 
 public:
 	/* Constructors and destructors */
+	SimpleCycle();
 	SimpleCycle(Date& _date_of_election, int number_of_electors);
 	virtual ~SimpleCycle();
 	/* Getters */
@@ -23,4 +30,8 @@ public:
 	bool setChosenElectorsLen(int new_len) { chosen_electors_logi = new_len; return true; }
 	/* Operator overloads */
 	friend ostream& operator<<(ostream & os, const SimpleCycle& cycle);
+
+	/*Serialization*/
+	virtual void save(ostream& out) const;
+	virtual void load(istream& in);
 };
