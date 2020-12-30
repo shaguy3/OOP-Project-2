@@ -17,6 +17,7 @@ void swap(int& a, int& b)
 }
 
 void addCounty(ComplexCycle* election_cycle) {
+    bool isRelative;
     char* county_name = new char[30];
     cout << "Please enter the County's name: ";
     cin >> county_name;
@@ -29,6 +30,12 @@ void addCounty(ComplexCycle* election_cycle) {
         cin >> is_relative;
     }
 
+
+    if (is_relative == 'y')
+        isRelative = true;
+    else
+        isRelative = false;
+
     int number_of_electors = 0;
     cout << "Please enter the number of electors in the county: ";
     cin >> number_of_electors;
@@ -37,7 +44,7 @@ void addCounty(ComplexCycle* election_cycle) {
         cin >> number_of_electors;
     }
 
-    County* new_county = new County(county_name, number_of_electors, is_relative);
+    County* new_county = new County(county_name, number_of_electors, isRelative);
     election_cycle->addCounty(new_county);
 
     delete[] county_name;
@@ -515,8 +522,7 @@ void saveElectionCycle(ElectionCycle* election_cycle) {
         exit(-1);
     }
 
-    SimpleCycle* simple_cycle = dynamic_cast<SimpleCycle*>(election_cycle);
-    simple_cycle->save(outfile);
+    election_cycle->save(outfile);
 
     outfile.close();
 }
@@ -537,8 +543,17 @@ ElectionCycle* loadElectionCycle() {
     int cycle_type = -1;
     infile.read(rcastc(&cycle_type), sizeof(cycle_type));
 
-    election_cycle = new SimpleCycle();
+    if (cycle_type == 1)
+    {
+        election_cycle = new ComplexCycle();
+
+    }
+    else
+    {
+        election_cycle = new SimpleCycle();
+    }
     election_cycle->load(infile);
+
 
     infile.close();
 

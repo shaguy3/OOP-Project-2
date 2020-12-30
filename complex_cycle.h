@@ -10,6 +10,7 @@ private:
 
 public:
     /* Constructors and destructors */
+    ComplexCycle();
     ComplexCycle(Date& _date_of_election);
     virtual ~ComplexCycle();
     /* Getters */

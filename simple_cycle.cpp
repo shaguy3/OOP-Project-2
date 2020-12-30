@@ -114,6 +114,7 @@ void SimpleCycle::load(istream& in) {
 	in.read(rcastc(&parties_num_size), sizeof(parties_num_size));
 	in.read(rcastc(&parties_num_logi), sizeof(parties_num_logi));
 
+	Party::number_of_parties = parties_num_logi;
 	parties = new Party * [parties_num_size];
 
 	/* Loading the parties */
@@ -155,6 +156,14 @@ void SimpleCycle::load(istream& in) {
 		in.read(rcastc(&cur_chosen_elector_id), sizeof(cur_chosen_elector_id));
 		addChosenElector(getResident(cur_chosen_elector_id));
 	}
+
+	for (int i = 0; i < residents_num_logi; i++)
+	{
+		if (voted_parties[i] != -1)
+			residents[i]->setVoted(parties[voted_parties[i]]);
+	}
+
+	/* Freeing the memory */
 
 	delete[] voted_parties;
 }
