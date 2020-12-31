@@ -37,3 +37,16 @@ std::ostream& operator<<(std::ostream& os, const Date& date) {
 
 Date::~Date() {
 }
+
+void Date::save(ostream& out) const
+{
+    out.write(rcastcc(&day), sizeof(day));
+    out.write(rcastcc(&month), sizeof(month));
+    out.write(rcastcc(&year), sizeof(year));
+}
+void Date::load(istream& in)
+{
+    in.read(rcastc(&day), sizeof(day));
+    in.read(rcastc(&month), sizeof(day));
+    in.read(rcastc(&year), sizeof(day));
+}
