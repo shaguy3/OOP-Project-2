@@ -17,6 +17,7 @@ void swap(int& a, int& b)
 }
 
 void addCounty(ComplexCycle* election_cycle) {
+    bool isRelative;
     char* county_name = new char[30];
     cout << "Please enter the County's name: ";
     cin >> county_name;
@@ -29,6 +30,12 @@ void addCounty(ComplexCycle* election_cycle) {
         cin >> is_relative;
     }
 
+
+    if (is_relative == 'y')
+        isRelative = true;
+    else
+        isRelative = false;
+
     int number_of_electors = 0;
     cout << "Please enter the number of electors in the county: ";
     cin >> number_of_electors;
@@ -37,7 +44,7 @@ void addCounty(ComplexCycle* election_cycle) {
         cin >> number_of_electors;
     }
 
-    County* new_county = new County(county_name, number_of_electors, is_relative);
+    County* new_county = new County(county_name, number_of_electors, isRelative);
     election_cycle->addCounty(new_county);
 
     delete[] county_name;
@@ -503,6 +510,56 @@ void simpleElectionResults(SimpleCycle* election_cycle) {
     delete[] election_results;
 }
 
+void saveElectionCycle(ElectionCycle* election_cycle) {
+    char filename[30];
+    cout << "Saving current election cycle..." << endl;
+    cout << "Please enter the name of the file you want to save (no spaces and extention required). ";
+    cin >> filename;
+
+    ofstream outfile(filename, ios::binary);
+    if (!outfile) {
+        cout << "Error with outfile" << endl;
+        exit(-1);
+    }
+
+    election_cycle->save(outfile);
+
+    outfile.close();
+}
+
+ElectionCycle* loadElectionCycle() {
+    ElectionCycle* election_cycle;
+
+    char filename[30];
+    cout << "Please enter the name of the file you want to load (no spaces and extention required). ";
+    cin >> filename;
+
+    ifstream infile(filename, ios::binary);
+    if (!infile) {
+        cout << "Error with infile" << endl;
+        exit(-1);
+    }
+
+    int cycle_type = -1;
+    infile.read(rcastc(&cycle_type), sizeof(cycle_type));
+
+    if (cycle_type == 1)
+    {
+        election_cycle = new ComplexCycle();
+
+    }
+    else
+    {
+        election_cycle = new SimpleCycle();
+    }
+    election_cycle->load(infile);
+
+
+    infile.close();
+
+    return election_cycle;
+}
+
 void mainMenu(ElectionCycle* election_cycle) {
     int choice = 0;
 
@@ -685,46 +742,14 @@ void mainMenu(ElectionCycle* election_cycle) {
             break;
         case Save_Cycle:
         {
-            char filename[30];
-            cout << "Saving current election cycle..." << endl;
-            cout << "Please enter the name of the file you want to save (no spaces and extention required). ";
-            cin >> filename;
-
-            ofstream outfile(filename, ios::binary);
-            if (!outfile) {
-                cout << "Error with outfile" << endl;
-                exit(-1);
-            }
-
-            //election_cycle->getDate().save(outfile);
-
-            ComplexCycle* complex_cycle = dynamic_cast<ComplexCycle*>(election_cycle);
-            complex_cycle->getCounty(0)->save(outfile);
-
-            outfile.close();
+            saveElectionCycle(election_cycle);
             break;
         }
 
         case Load_Cycle:
-            ComplexCycle* complex_cycle = dynamic_cast<ComplexCycle*>(election_cycle);
-            char filename[30];
-            cout << "Please enter the name of the file you want to load (no spaces and extention required). ";
-            cin >> filename;
+            delete election_cycle; // delete yourself fool
 
-            ifstream infile(filename, ios::binary);
-            if (!infile) {
-                cout << "Error with infile" << endl;
-                exit(-1);
-            }
-
-            //election_cycle->getDate().load(infile);
-            County* newCounty = new County();
-
-            newCounty->load(infile);
-            cout << *newCounty << endl;
-
-            infile.close();
-
+            election_cycle = loadElectionCycle();
             
             break;
         }
@@ -735,6 +760,7 @@ void mainMenu(ElectionCycle* election_cycle) {
 
 void firstMenu() {
     int choice = 0;
+    ElectionCycle* election_cycle;
 
     enum firstMenu {None, New_Election_Cycle, Load_Election_Cycle, Exit};
 
@@ -802,18 +828,20 @@ void firstMenu() {
                 cin >> number_of_electors;
             }
 
-            ElectionCycle* election_cycle = new SimpleCycle(date_of_election, number_of_electors);
+            election_cycle = new SimpleCycle(date_of_election, number_of_electors);
             mainMenu(election_cycle);
         }
         else if (type == Complex_cycle) {
-            ElectionCycle* election_cycle = new ComplexCycle(date_of_election);
+            election_cycle = new ComplexCycle(date_of_election);
             mainMenu(election_cycle);
         }
 
         break;
     }
     case Load_Election_Cycle:
-        // Load an existing election cycle.
+        election_cycle = loadElectionCycle();
+        mainMenu(election_cycle);
+
         break;
 
     case Exit:

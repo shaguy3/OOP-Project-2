@@ -2,7 +2,12 @@
 
 #include <iostream>
 #include "county.h"
+#include "party.h"
 #include <string.h>
+#include <fstream>
+
+#define rcastcc reinterpret_cast<const char*>
+#define rcastc reinterpret_cast<char*>
 
 using namespace std;
 class County;
@@ -19,6 +24,7 @@ private:
 
 public:
     /*Constructors & Destructors*/
+    Citizen();
     Citizen(char* _name, int _id, int _year_of_birth, County* _home_county);
     ~Citizen();
     /*Getters*/
@@ -31,6 +37,11 @@ public:
     /*Setters*/
     bool makeRepresentative(Party* party_name);
     bool setVoted(Party* party_name);
+    bool setHomeCounty(County* county);
     /*Operators*/
     friend ostream& operator<<(ostream& os, const Citizen& other);
+
+    /*Serialization*/
+    void save(ostream& out) const;
+    void load(istream& in);
 };

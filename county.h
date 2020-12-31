@@ -45,6 +45,12 @@ public:
     int chosenElectorsLen() const { return chosen_electors_logi; }
     /* Setter */
     bool setChosenElectorsLen(int new_len) { chosen_electors_logi = new_len; return true; }
+    bool setChosenElectorsSize(int new_len){ chosen_electors_size = new_len; return true; }
+    bool init_chosen_electors(int size) { chosen_electors = new Citizen * [size]; return chosen_electors; }
+
+    bool setResidentsLen(int new_len) { residents_num_logi = new_len; return true; }
+    bool setResidentsSize(int new_len) { residents_num_size = new_len; return true; }
+    bool init_residents(int size) { residents = new Citizen * [size]; return residents; }
     /* Adders */
     bool addVote();
     bool addResident(Citizen* new_resident);
