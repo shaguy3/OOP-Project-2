@@ -58,6 +58,8 @@ void Party::resizeParty()
         new_arr[i] = party_reps[i];
     }
 
+    delete[] party_reps;
+
     party_reps = new_arr;
 }
 

@@ -30,6 +30,8 @@ void ComplexCycle::resizeCounties() {
         new_arr[i] = counties[i];
     }
 
+    delete[] counties;
+
     counties = new_arr;
 }
 
@@ -120,14 +122,16 @@ void ComplexCycle::load(istream& in) {
 
     int** chosen_electors_arr = new int* [counties_num_logi];
 
+    /* Loading the counties */
     for (int i = 0; i < counties_num_logi; i++)
     {
         counties[i] = new County();
         counties[i]->load(in);
-        chosen_electors_arr[i] = new int[counties[i]->chosenElectorsLen()];
-        counties[i]->init_chosen_electors(counties[i]->chosenElectorsLen());
-        counties[i]->init_residents(counties[i]->residentsLen());
+        counties[i]->init_chosen_electors();
+        counties[i]->init_residents();
         
+        /* Reading the ids of the electors */
+        chosen_electors_arr[i] = new int[counties[i]->chosenElectorsLen()];
         for (int j = 0; j < counties[i]->chosenElectorsLen(); j++)
         {
             in.read(rcastc(&chosen_electors_arr[i][j]), sizeof(chosen_electors_arr[i][j]));
@@ -152,7 +156,7 @@ void ComplexCycle::load(istream& in) {
         in.read(rcastc(&cur_home_county), sizeof(cur_home_county));
         residents[i]->setHomeCounty(counties[cur_home_county]);
         counties[cur_home_county]->addResident(residents[i]);
-        in.read(rcastc(&voted_parties[i]), sizeof(voted_parties[i])); // TODO: set the votes later.
+        in.read(rcastc(&voted_parties[i]), sizeof(voted_parties[i]));
     }
 
     /* Loading the numbers of the parties */
@@ -172,6 +176,7 @@ void ComplexCycle::load(istream& in) {
         /* Loading the leader id */
         in.read(rcastc(&cur_leader_id), sizeof(cur_leader_id));
         parties[i]->setLeader(getResident(cur_leader_id));
+        getResident(cur_leader_id)->makeRepresentative(parties[i]);
 
         /* Loading the party reps numbers */
         in.read(rcastc(&cur_size), sizeof(cur_size));
@@ -181,13 +186,16 @@ void ComplexCycle::load(istream& in) {
         parties[i]->setPartyLogi(cur_logi_size);
         parties[i]->initReps(cur_size);
 
+        /* Adding the party reps */
         int cur_party_rep_id = 0;
         for (int j = 0; j < cur_logi_size; j++) {
             in.read(rcastc(&cur_party_rep_id), sizeof(cur_party_rep_id));
             parties[i]->getPartyReps()[j] = getResident(cur_party_rep_id);
+            getResident(cur_party_rep_id)->makeRepresentative(parties[i]);
         }
     }
 
+    /* Setting the votes */
     for (int i = 0; i < residents_num_logi; i++)
     {
         if (voted_parties[i] != -1)
@@ -195,7 +203,6 @@ void ComplexCycle::load(istream& in) {
     }
 
     /* Freeing the memory */
-
     for (int i = 0; i < counties_num_logi; i++)
     {
         delete[] chosen_electors_arr[i];

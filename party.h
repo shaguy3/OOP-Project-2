@@ -23,28 +23,31 @@ private:
 public:
     static int number_of_parties;
 
-    /*Ctors & Dtors*/
+    /* Ctors & Dtors */
     Party();
     Party(char* _name, Citizen* _party_leader);
     ~Party();
 
-    /*Getters*/
+    /* Getters */
     char* getName() { return name; }
     int getId() { return id; }
     Citizen* getLeader() { return party_leader; }
     Citizen** getPartyReps() { return party_reps; }
     int partyRepsLen() const { return party_size_logi; }
-    /*Setters*/
+
+    /* Setters */
     bool setLeader(Citizen* leader) { party_leader = leader; return true; }
     bool setPartySize(int _party_size) { party_size = _party_size; return true; }
     bool setPartyLogi(int _party_logi) { party_size_logi = _party_logi; return true; }
     bool initReps(int size) { party_reps = new Citizen * [size]; return true; }
-    /*Methods*/
+
+    /* Methods */
     bool addPartyRep(Citizen* citizen);         //Add the citizen as party rep
-    /*Operators*/
+
+    /* Operators */
     friend ostream& operator<<(ostream& os, const Party& party);
 
-    /*Serialization*/
+    /* Serialization */
     void save(ostream& out) const;
     void load(istream& in);
 };

@@ -38,6 +38,8 @@ void ElectionCycle::resizeResidents() {
         new_arr[i] = residents[i];
     }
 
+    delete[] residents;
+
     residents = new_arr;
 }
 
@@ -48,6 +50,8 @@ void ElectionCycle::resizeParties() {
     for (int i = 0; i < parties_num_logi; i++) {
         new_arr[i] = parties[i];
     }
+
+    delete[] parties;
 
     parties = new_arr;
 }

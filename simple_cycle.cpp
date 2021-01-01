@@ -107,7 +107,7 @@ void SimpleCycle::load(istream& in) {
 
 		residents[i]->load(in);
 		in.read(rcastc(&cur_home_county), sizeof(cur_home_county));
-		in.read(rcastc(&voted_parties[i]), sizeof(voted_parties[i])); // TODO: set the votes later.
+		in.read(rcastc(&voted_parties[i]), sizeof(voted_parties[i]));
 	}
 
 	/* Loading the numbers of the parties */
@@ -127,6 +127,7 @@ void SimpleCycle::load(istream& in) {
 		/* Loading the leader id */
 		in.read(rcastc(&cur_leader_id), sizeof(cur_leader_id));
 		parties[i]->setLeader(getResident(cur_leader_id));
+		getResident(cur_leader_id)->makeRepresentative(parties[i]);
 
 		/* Loading the party reps numbers */
 		in.read(rcastc(&cur_size), sizeof(cur_size));
@@ -136,10 +137,12 @@ void SimpleCycle::load(istream& in) {
 		parties[i]->setPartyLogi(cur_logi_size);
 		parties[i]->initReps(cur_size);
 
+		/* Adding the party_reps */
 		int cur_party_rep_id = 0;
 		for (int j = 0; j < cur_logi_size; j++) {
 			in.read(rcastc(&cur_party_rep_id), sizeof(cur_party_rep_id));
 			parties[i]->getPartyReps()[j] = getResident(cur_party_rep_id);
+			getResident(cur_party_rep_id)->makeRepresentative(parties[i]);
 		}
 	}
 
@@ -157,6 +160,7 @@ void SimpleCycle::load(istream& in) {
 		addChosenElector(getResident(cur_chosen_elector_id));
 	}
 
+	/* Setting the votes */
 	for (int i = 0; i < residents_num_logi; i++)
 	{
 		if (voted_parties[i] != -1)
@@ -164,45 +168,5 @@ void SimpleCycle::load(istream& in) {
 	}
 
 	/* Freeing the memory */
-
 	delete[] voted_parties;
 }
-
-/*
-citizen loader:
-1. load name
-2. load id
-3. load year of birth
-- everything else is null
-
-party loader:
-1. load name
-2. load id
-
-
-election cycle loader:
-1. if simple:
-	1.1 load
-2. load residents:
-	2.1 load number of residents
-	2.2 set up an array with the size of the residents
-	2.3 for each resident
-		2.3.1 load the resident
-		2.3.2 set the resident home county as the loaded home county id
-		2.3.3 save the number of the voted party
-3. load parties:
-	3.1 load number of parties
-	3.2 for each party
-		3.2.1 load party
-		3.2.2 set the leader id from the residents array
-		3.2.3 set the reps from the residents array
-*/
-
-/*
-* 0: simple
-* date
-* 
-* 
-23guy31995214arie19961023Red03504Blue1...
-[0: 1, 1: 0]
-*/
