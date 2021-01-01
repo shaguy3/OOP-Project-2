@@ -26,25 +26,21 @@ public:
     ElectionCycle();
     ElectionCycle(Date& _date_of_election);
     virtual ~ElectionCycle();
-
     /* Getters */
-    Date& getDate() { return date_of_election; }
+    Date getDate() const { return date_of_election; }
     Citizen** getResidents() const { return residents; }
     Party** getParties() const { return parties; }
     int getVoteAmount() const { return current_vote_amount; }
     int residentslen() const { return residents_num_logi; }
     int partieslen() const { return parties_num_logi; }
-
     /* Get specific items from the arrays */
     Citizen* getResident(int id) const;
     Party* getParty(char* party_name) const;
-
     /* Adders */
     bool addVote();
     bool addResident(Citizen* resident);
     bool addParty(Party* party);
-
-    /* Serialization */
+    /* serialization */
     virtual void save(ostream& out) const = 0;
     virtual void load(istream& in) = 0;
 };

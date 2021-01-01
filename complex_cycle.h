@@ -13,15 +13,12 @@ public:
     ComplexCycle();
     ComplexCycle(Date& _date_of_election);
     virtual ~ComplexCycle();
-
     /* Getters */
     County** getCounties() const { return counties; }
     int countieslen() const { return counties_num_logi; }
     County* getCounty(int id) const { return counties[id]; }
-
     /* Adders */
     bool addCounty(County* county);
-
     /* Operators */
     friend ostream& operator<<(ostream& os, const ComplexCycle& election_cycle);
 

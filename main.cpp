@@ -7,7 +7,6 @@
 
 using namespace std;
 
-
 const int VOTING_AGE = 16;
 
 void swap(int& a, int& b)
@@ -20,9 +19,8 @@ void swap(int& a, int& b)
 void addCounty(ComplexCycle* election_cycle) {
     bool isRelative;
     char* county_name = new char[30];
-    cin.ignore();
     cout << "Please enter the County's name: ";
-    cin.getline(county_name, 30);
+    cin >> county_name;
 
     char is_relative;
     cout << "Is the county relative (assignes it's electors relatively to the partie's vote percent)? (y/n): ";
@@ -169,17 +167,16 @@ void addPartyRep(ElectionCycle* election_cycle) {
     } while (party_rep_id == -1);
 
     char* party_name = new char[30];
-    cin.ignore();
     cout << "Please enter the name of the party representative's party: ";
     do {
-        
-        cin.getline(party_name, 30);
+        cin >> party_name;
         relevant_party = election_cycle->getParty(party_name);
         if (!relevant_party) {
-            cin.ignore();
             cout << "There is no party with that name. Please select an existing name: ";
         }
     } while (!relevant_party);
+
+    //TODO: Think of the way to choose which county to represent
 
     relevant_citizen->makeRepresentative(relevant_party);
     relevant_party->addPartyRep(election_cycle->getResident(party_rep_id));
@@ -309,8 +306,6 @@ void complexElectionResults(ComplexCycle* election_cycle) {
             votes_per_party[i] += election_result[j][i];
     }
 
-    double double_percent = 0.0;
-    int int_percent = 0;
     for (int i = 0; i < election_cycle->countieslen(); i++)     // Counting the percentage of the votes 
     {
         for (int j = 0; j < election_cycle->partieslen(); j++)
@@ -393,6 +388,9 @@ void complexElectionResults(ComplexCycle* election_cycle) {
             }
         }
     }
+    
+    // TODO: print vote percentage. We did it for each county, is there a need for overall percentage?
+ 
 
     cout << "Final results:" << endl << endl;
     for (int i = 0; i < election_cycle->partieslen(); i++) {
@@ -423,15 +421,11 @@ void complexElectionResults(ComplexCycle* election_cycle) {
 }
 
 void simpleElectionResults(SimpleCycle* election_cycle) {
-
-    cout << "*****************Printing election results!********************" << endl << endl;
-
     int* election_results = new int[election_cycle->partieslen()];              //Number of votes for each party.
     double* percentage_table = new double[election_cycle->partieslen()];        //Percentage of received votes for each party.
     int* elected_reps_nums = new int[election_cycle->partieslen()];             //Number of electors for each party.
     int* sorted_parties = new int[election_cycle->partieslen()];                //Parties sorted from the most electors to less.
 
-    /* Arrays initializations */
     for (int i = 0; i < election_cycle->partieslen(); i++) {
         election_results[i] = 0;
         percentage_table[i] = 0.0;
@@ -465,7 +459,6 @@ void simpleElectionResults(SimpleCycle* election_cycle) {
         }
     }
 
-    /* Addnig the chosen electors */
     for (int i = 0; i < election_cycle->partieslen(); i++) {
         int cur_num_of_reps = elected_reps_nums[i];
         for (int j = 0; j < election_cycle->getParties()[i]->partyRepsLen(); j++) {
@@ -767,7 +760,7 @@ void mainMenu(ElectionCycle* election_cycle) {
 
 void firstMenu() {
     int choice = 0;
-    ElectionCycle* election_cycle = nullptr;
+    ElectionCycle* election_cycle;
 
     enum firstMenu {None, New_Election_Cycle, Load_Election_Cycle, Exit};
 
@@ -846,10 +839,6 @@ void firstMenu() {
         break;
     }
     case Load_Election_Cycle:
-
-        if (election_cycle)
-            delete election_cycle;
-
         election_cycle = loadElectionCycle();
         mainMenu(election_cycle);
 
@@ -863,8 +852,6 @@ void firstMenu() {
         break;
     }
 
-    if (election_cycle)
-        delete election_cycle;
 }
 
 int main() {
