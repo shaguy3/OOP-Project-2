@@ -90,7 +90,7 @@ void addResident(ElectionCycle* election_cycle) {
 
     if (typeid(*election_cycle).name() == typeid(ComplexCycle).name()) {
 
-        // TODO: May cause loss of pointer. Check. (Works fine for now)
+        
         ComplexCycle* complex_cycle = dynamic_cast<ComplexCycle*>(election_cycle);
 
         int county_id = -1;
