@@ -1,10 +1,2 @@
-﻿  citizen.cpp
-  complex_cycle.cpp
-  county.cpp
-  date.cpp
-  election_cycle.cpp
-  main.cpp
-  party.cpp
-  simple_cycle.cpp
-  Generating Code...
+﻿  main.cpp
   OOP-Project-2.vcxproj -> C:\Users\גיא\Documents\Repos\OOP-Project-2\x64\Debug\OOP-Project-2.exe

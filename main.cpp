@@ -261,36 +261,21 @@ void complexElectionResults(ComplexCycle* election_cycle) {
     int* electors_per_party = new int[election_cycle->partieslen()];                //Amount of electors that each party received
     int* votes_per_party = new int[election_cycle->partieslen()];                   //Amount of votes that each party received
 
-    for (int i = 0; i < election_cycle->countieslen(); i++)     // Initilization of election_result array
+    for (int i = 0; i < election_cycle->countieslen(); i++)     // Initilization of two dimantional arrays
     {
         election_result[i] = new int[election_cycle->partieslen()];
-        for (int j = 0; j < election_cycle->partieslen(); j++)
-            election_result[i][j] = 0;
-    }
-
-    for (int i = 0; i < election_cycle->countieslen(); i++)     // Initilization of percentage_table array
-    {
         percentage_table[i] = new double[election_cycle->partieslen()];
-        for (int j = 0; j < election_cycle->partieslen(); j++)
-            percentage_table[i][j] = 0;
-    }
-
-    for (int i = 0; i < election_cycle->countieslen(); i++)     // Initilization of elected_reps_nums array
-    {
         elected_reps_nums[i] = new int[election_cycle->partieslen()];
-        for (int j = 0; j < election_cycle->partieslen(); j++)
+        for (int j = 0; j < election_cycle->partieslen(); j++) {
+            election_result[i][j] = 0;
+            percentage_table[i][j] = 0;
             elected_reps_nums[i][j] = 0;
+        }
     }
 
-    for (int i = 0; i < election_cycle->partieslen(); i++) {    // Initialization of sorted_parties array
+    for (int i = 0; i < election_cycle->partieslen(); i++) {    // Initialization of one dimantional arrays
         sorted_parties[i] = i;
-    }
-
-    for (int i = 0; i < election_cycle->partieslen(); i++) {    // Initializing the sum of electors per party
         electors_per_party[i] = 0;
-    }
-
-    for (int i = 0; i < election_cycle->partieslen(); i++) {    // Initializing the sum of votes per party
         votes_per_party[i] = 0;
     }
 
@@ -465,7 +450,7 @@ void simpleElectionResults(SimpleCycle* election_cycle) {
         }
     }
 
-    /* Addnig the chosen electors */
+    /* Adding the chosen electors */
     for (int i = 0; i < election_cycle->partieslen(); i++) {
         int cur_num_of_reps = elected_reps_nums[i];
         for (int j = 0; j < election_cycle->getParties()[i]->partyRepsLen(); j++) {
@@ -754,7 +739,7 @@ void mainMenu(ElectionCycle* election_cycle) {
         }
 
         case Load_Cycle:
-            delete election_cycle; // delete yourself fool
+            delete election_cycle;
 
             election_cycle = loadElectionCycle();
             
